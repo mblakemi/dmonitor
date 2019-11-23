@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Temperature Graph</title>
+	<link href="static/examples.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="static/flot/jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="static/flot/jquery.flot.js"></script>
+	<script type="text/javascript">
+
+	$(function() {
+
+		var tval = [
+[46,41.5], [45,41.7], [44,42.1], [43,42.3], [42,42.4], [41,42.8], [40,43.3], [39,43.7], [31,39.9], [18,39.0], [17,39.4], [16,39.0], [15,39.0], [14,38.5], [13,38.1], [12,37.6], [11,37.6], [10,37.2], [9,36.5], [8,36.3], [7,35.4], [6,34.9], [5,34.9], [4,35.1], [3,35.2], [2,34.7], [1,34.5], [0,34.2], 		];
+
+		var plot = $.plot("#placeholder", [
+			{ data: tval, label: "T"}
+		], {
+			series: {
+				lines: {
+					show: true
+				},
+				points: {
+					show: true
+				}
+			},
+			grid: {
+				hoverable: true,
+				clickable: true
+			},
+			//yaxis: {
+			//	min: -1.2,
+			//	max: 1.2
+			//}
+		});
+
+		$("<div id='tooltip'></div>").css({
+			position: "absolute",
+			display: "none",
+			border: "1px solid #fdd",
+			padding: "2px",
+			"background-color": "#fee",
+			opacity: 0.80
+		}).appendTo("body");
+
+		$("#placeholder").bind("plothover", function (event, pos, item) {
+
+			if ($("#enablePosition:checked").length > 0) {
+				var x=(pos.x + 24)%24;
+				var ampm = "a";
+				if (x >= 12) {
+					ampm = "p";
+				}
+				x = x % 12;
+				var xh = Math.floor(x);
+				var xm = (x - xh)*60;
+				if (xh == 0)
+					xh=12;
+				var str = "( at " + xh.toFixed(0) +":" + xm.toFixed(0)+ ampm + ", T=" + pos.y.toFixed(2) + "*F)";
+				$("#hoverdata").text(str);
+			}
+
+			if (item) {
+				var x = item.datapoint[0],
+					y = item.datapoint[1].toFixed(2);
+				x = (x+24) % 24;
+				var ampm = "a";
+				if (x >= 12) {
+					ampm = "p";
+				}
+				x = x % 12;
+				if (x >= 0 && x < 1.0) {
+                                           x += 12;
+                                }
+				x = x.toFixed(2) + ampm;
+				$("#tooltip").html(item.series.label + " at " + x + " = " + y + " *F")
+					.css({top: item.pageY+5, left: item.pageX+5})
+					.fadeIn(200);
+			}
+		});
+
+		$("#placeholder").bind("plotclick", function (event, pos, item) {
+			if (item) {
+				$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
+				plot.highlight(item.series, item.datapoint);
+			}
+		});
+	});
+
+	</script>
+</head>
+<body>
+
+	<div id="header">
+		<h2>Hourly Temperature Plot: Outside</h2>
+	</div>
+ <a href="sourcep">Source</a>  <a href="darkp">Dark</a> <a href="pressurep">Pressure</a><h3>Nov 18 2019   <a href="prev">Prev</a>  <a href="inoutr">Home</a></h3>
+	<div id="content">
+
+		<div class="demo-container">
+			<div id="placeholder" class="demo-placeholder"></div>
+		</div>
+
+		<p>Try pointing and clicking on the points.</p>
+
+		<p>
+			<label><input id="enablePosition" type="checkbox" checked="checked"></input>Show mouse position</label>
+			<span id="hoverdata"></span>
+			<span id="clickdata"></span>
+		</p>
+	</div>
+</body>
+</html>

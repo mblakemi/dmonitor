@@ -1,0 +1,62 @@
+2/15/2019: Pi restarted before trip, did not use remote view since then 
+3/1/2019: Crashed (flask) checking 3/1/2019, restarted Pi
+(Note garage heater problems Thu Feb 28 so high was then around 45
+fixed Tue March 5)
+3/12/2019 Crashed after using remote access. Restarted 3/13/19 10:50 am
+3/21/2019 Restarted before Spain trip
+4/3/2019 9 pm  Crash, mouse or keyboard not recognized
+4/17/2019 Crashed 11 am (monitor stopped first)
+(note 4/20, 4/23, 4/24 restarted just admonitor.py)
+4/27/2019 Crashed 3 am, 8 am no screen had to power up again
+5/16/2019 1:50 pm seemed to stop getting readings- Restarted
+5/30/2019 adsmonitor.py developed to use signaling to avoid
+hanging on opening connections to probes
+6/11/2019 Pi crashed - myflaskd pipe problem and pi froze - restarted
+(note adsmonitor.py seemed to still be running)
+6/19/2019 Restarted - Replaced outdoor DH11
+6/24/2019 Restarted pre DC trip (Note, when just closed os window and 
+tried to restart myflaskd.py, it didn't work. So, restarted.
+
++
+
+
+Could not read 141.133.76.62 try 5 at 2019-05-29 06:01:20
+*** read error at *** 2019-05-29 06:01:22.999223
+- No temperature available, skipped ***** ID =40  T =2019-05-29 05:50:15.100244
++ . * - + . 
+Could not read 141.133.76.62 try 1 at 2019-05-29 06:12:26
+. * - + . * - + . * - + . * - + . 
+Could not read 141.133.76.62 try 1 at 2019-05-29 06:32:24
+. * - + . * - + . * - + . * - + . * - + . * - + . * - + . * - + . 
+Could not read 141.133.76.62 try 1 at 2019-05-29 07:12:25
+. 
+Could not read 141.133.76.62 try 2 at 2019-05-29 07:12:37
+. * - + . * - + . * - + . * - + . 
+Could not read 141.133.76.62 try 1 at 2019-05-29 07:32:29
+. 
+Could not read 141.133.76.62 try 2 at 2019-05-29 07:34:42
+. * - + . * - + . * - + . * - + . 
+Could not read 141.133.76.62 try 1 at 2019-05-29 07:52:27
+. 
+Could not read 141.133.76.62 try 2 at 2019-05-29 07:54:40
+. 
+Could not read 141.133.76.62 try 3 at 2019-05-29 07:56:53
+.
+>>>
+Could not read 141.133.76.62 try 1 at 2019-05-25 22:16:16
+. * - + . * - + . * - + . * - + . * - + . 
+Could not read 141.133.76.227 try 1 at 2019-05-25 22:22:30
+. 
+Could not read 141.133.76.227 try 2 at 2019-05-25 22:24:43
+.
+(Still running trying again)
+ ------------ tkdmonitor -----------
+OLD 43: 11:22:15 AM Mon May 20 2019 at 11:26:07
+OLD 40: 11:24:15 AM Mon May 20 2019 at 11:28:07
+OLD 43: 11:24:15 AM Mon May 20 2019 at 11:28:07
+OLD 40: 11:28:15 AM Mon May 20 2019 at 11:32:07
+OLD 43: 11:28:15 AM Mon May 20 2019 at 11:32:07
+OLD 40: 11:30:15 AM Mon May 20 2019 at 11:34:07
+OLD 43: 11:30:15 AM Mon May 20 2019 at 11:34:07
+after mainloop closed db
+
