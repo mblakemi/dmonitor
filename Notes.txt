@@ -19,44 +19,13 @@ tried to restart myflaskd.py, it didn't work. So, restarted.
 
 +
 
-
-Could not read 141.133.76.62 try 5 at 2019-05-29 06:01:20
-*** read error at *** 2019-05-29 06:01:22.999223
-- No temperature available, skipped ***** ID =40  T =2019-05-29 05:50:15.100244
-+ . * - + . 
-Could not read 141.133.76.62 try 1 at 2019-05-29 06:12:26
-. * - + . * - + . * - + . * - + . 
-Could not read 141.133.76.62 try 1 at 2019-05-29 06:32:24
-. * - + . * - + . * - + . * - + . * - + . * - + . * - + . * - + . 
-Could not read 141.133.76.62 try 1 at 2019-05-29 07:12:25
-. 
-Could not read 141.133.76.62 try 2 at 2019-05-29 07:12:37
-. * - + . * - + . * - + . * - + . 
-Could not read 141.133.76.62 try 1 at 2019-05-29 07:32:29
-. 
-Could not read 141.133.76.62 try 2 at 2019-05-29 07:34:42
-. * - + . * - + . * - + . * - + . 
-Could not read 141.133.76.62 try 1 at 2019-05-29 07:52:27
-. 
-Could not read 141.133.76.62 try 2 at 2019-05-29 07:54:40
-. 
-Could not read 141.133.76.62 try 3 at 2019-05-29 07:56:53
-.
->>>
-Could not read 141.133.76.62 try 1 at 2019-05-25 22:16:16
-. * - + . * - + . * - + . * - + . * - + . 
-Could not read 141.133.76.227 try 1 at 2019-05-25 22:22:30
-. 
-Could not read 141.133.76.227 try 2 at 2019-05-25 22:24:43
-.
-(Still running trying again)
- ------------ tkdmonitor -----------
-OLD 43: 11:22:15 AM Mon May 20 2019 at 11:26:07
-OLD 40: 11:24:15 AM Mon May 20 2019 at 11:28:07
-OLD 43: 11:24:15 AM Mon May 20 2019 at 11:28:07
-OLD 40: 11:28:15 AM Mon May 20 2019 at 11:32:07
-OLD 43: 11:28:15 AM Mon May 20 2019 at 11:32:07
-OLD 40: 11:30:15 AM Mon May 20 2019 at 11:34:07
-OLD 43: 11:30:15 AM Mon May 20 2019 at 11:34:07
-after mainloop closed db
-
+Could not read 141.133.76.227 try 5 at 2019-11-26 11:44:02
+*** read error at *** 2019-11-26 11:44:04.029184
+No temperature available, skipped ***** ID =43  T =2019-11-26 11:40:15.003923
+Signal handler called with signal 14
+Traceback (most recent call last):
+  File "adsmonitor.py", line 418, in <module>
+    time.sleep(nextSleepSec)
+  File "adsmonitor.py", line 118, in handler
+    raise IOError("Couldn't open device!")
+IOError: Couldn't open device!
