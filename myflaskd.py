@@ -12,7 +12,7 @@ import math
 #19-11-16 1.01 Support for pressure and delta pressure
 #19-11-18 removed Rain column, added Dark option
 
-print 'Version 1.02'
+print 'Version 1.02.1'
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -283,10 +283,11 @@ stplotHeader = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.
 
 		var tval = [
 """
-stplotFooter1 = """		];
+
+stplotFooter0unit = """		];
 
 		var plot = $.plot("#placeholder", [
-			{ data: tval, label: "T"}
+			{ data: tval, label: "%s"}
 		], {
 			series: {
 				lines: {
@@ -305,88 +306,8 @@ stplotFooter1 = """		];
 			//	max: 1.2
 			//}
 		});
-
-		$("<div id='tooltip'></div>").css({
-			position: "absolute",
-			display: "none",
-			border: "1px solid #fdd",
-			padding: "2px",
-			"background-color": "#fee",
-			opacity: 0.80
-		}).appendTo("body");
-
-		$("#placeholder").bind("plothover", function (event, pos, item) {
-
-			if ($("#enablePosition:checked").length > 0) {
-				var x=(pos.x + 24)%24;
-				var ampm = "a";
-				if (x >= 12) {
-					ampm = "p";
-				}
-				x = x % 12;
-				var xh = Math.floor(x);
-				var xm = (x - xh)*60;
-				if (xh == 0)
-					xh=12;
-				var str = "( at " + xh.toFixed(0) +":" + xm.toFixed(0)+ ampm + ", T=" + pos.y.toFixed(2) + "*F)";
-				$("#hoverdata").text(str);
-			}
-
-			if (item) {
-				var x = item.datapoint[0],
-					y = item.datapoint[1].toFixed(2);
-				x = (x+24) % 24;
-				var ampm = "a";
-				if (x >= 12) {
-					ampm = "p";
-				}
-				x = x % 12;
-				if (x >= 0 && x < 1.0) {
-                                           x += 12;
-                                }
-				x = x.toFixed(2) + ampm;
-				$("#tooltip").html(item.series.label + " at " + x + " = " + y + " *F")
-					.css({top: item.pageY+5, left: item.pageX+5})
-					.fadeIn(200);
-			}
-		});
-
-		$("#placeholder").bind("plotclick", function (event, pos, item) {
-			if (item) {
-				$("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
-				plot.highlight(item.series, item.datapoint);
-			}
-		});
-	});
-
-	</script>
-</head>
-<body>
 """
-
-stplotFooter1pressure = """		];
-
-		var plot = $.plot("#placeholder", [
-			{ data: tval, label: "T"}
-		], {
-			series: {
-				lines: {
-					show: true
-				},
-				points: {
-					show: true
-				}
-			},
-			grid: {
-				hoverable: true,
-				clickable: true
-			},
-			//yaxis: {
-			//	min: -1.2,
-			//	max: 1.2
-			//}
-		});
-
+stplotFooter1 = """
 		$("<div id='tooltip'></div>").css({
 			position: "absolute",
 			display: "none",
@@ -409,8 +330,12 @@ stplotFooter1pressure = """		];
 				var xm = (x - xh)*60;
 				if (xh == 0)
 					xh=12;
-				var str = "( at " + xh.toFixed(0) +":" + xm.toFixed(0)+ ampm + ", T=" + pos.y.toFixed(2) + "*F)";
+"""
+splotFooter1units = """
+				var str = "( at " + xh.toFixed(0) +":" + xm.toFixed(0)+ ampm + ", %s=" + pos.y.toFixed(2) + " %s)";
 				$("#hoverdata").text(str);
+"""
+splotFooter1end = """
 			}
 
 			if (item) {
@@ -426,9 +351,13 @@ stplotFooter1pressure = """		];
                                            x += 12;
                                 }
 				x = x.toFixed(2) + ampm;
-				$("#tooltip").html(item.series.label + " at " + x + " = " + y + " inHg")
+"""
+stplotFooter2Tip = """
+				$("#tooltip").html(item.series.label + " at " + x + " = " + y + " %s")
 					.css({top: item.pageY+5, left: item.pageX+5})
 					.fadeIn(200);
+"""
+splotFooter3 = """
 			}
 		});
 
@@ -463,7 +392,7 @@ stplotDarkTitle = """
 	</div>
  """ 
   
-stplotFooter2 = """
+stplotFooterEnd = """
 	<div id="content">
 
 		<div class="demo-container">
@@ -536,13 +465,19 @@ def write_thplot(isensor, nDaysBack, bPressure):
     strDate = dtstart.strftime('%b %d %Y')
     
     if bPressure == 1:
-        splothtml = stplotHeader + stplotText + stplotFooter1pressure 
+        splothtml = stplotHeader + stplotText + stplotFooter0unit % ('P') + stplotFooter1
+        splothtml += splotFooter1units % ('P','inHg') + splotFooter1end       
+        splothtml += stplotFooter2Tip % ('inHg') + splotFooter3
         splothtml += stplotPressureTitle
     elif bPressure == 2:
-        splothtml = stplotHeader + stplotText + stplotFooter1pressure 
+        splothtml = stplotHeader + stplotText + stplotFooter0unit % ('D') +stplotFooter1
+        splothtml += splotFooter1units % ('D','dark')  + splotFooter1end 
+        splothtml += stplotFooter2Tip % ('dark') + splotFooter3
         splothtml += stplotDarkTitle
     else:
-        splothtml = stplotHeader + stplotText + stplotFooter1 
+        splothtml = stplotHeader + stplotText + stplotFooter0unit % ('T') + stplotFooter1
+        splothtml += splotFooter1units % ('T','*F') + splotFooter1end  
+        splothtml += stplotFooter2Tip % ('*F') + splotFooter3
         splothtml += stplotTitle % allSensorInfo[isensor].sname
 
     if bPressure == 0:
@@ -561,7 +496,7 @@ def write_thplot(isensor, nDaysBack, bPressure):
     if nDaysBack > 0:
         splothtml = splothtml + '   <a href="next">Next</a>'
     splothtml += "</h3>" 
-    splothtml += stplotFooter2
+    splothtml += stplotFooterEnd
     with open(sFilePlot,'w') as file:
         file.write(splothtml)        
     # close connection
@@ -832,8 +767,8 @@ if __name__ == "__main__":
     now = datetime.now()
     if btest:
         writehtml(g_sSource) #min max
-        nDaysBack = 2
-        mPressure = 2
+        nDaysBack = 1
+        mPressure = 1
         write_thplot(g_sSource, nDaysBack, mPressure)
         
         print 'test done'
