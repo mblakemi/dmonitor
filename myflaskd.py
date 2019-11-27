@@ -11,6 +11,7 @@ import math
 # is not changed
 #19-11-16 1.01 Support for pressure and delta pressure
 #19-11-18 removed Rain column, added Dark option
+#19-11-27 delta pressure uses closest to time back
 
 print 'Version 1.02.1'
 
@@ -19,7 +20,7 @@ app = Flask(__name__, static_url_path='/static')
 #pi ip address is:http://192.168.0.105/
 #pi can use localhost instead of ip address
 
-btest = True #True # Run test and not flask
+btest = False #True # Run test and not flask
 
 nRestarts = 0
 g_timeString="none"
@@ -156,7 +157,8 @@ infoCardEnd = """
 ################ Get change in pressure from 2 hours ago in inHg/hr
 def getPressDelta(conn, fpress):
     fHourBack = 2.5
-    dDate = datetime.now() - timedelta(hours = fHourBack)
+    date_now = datetime.now()
+    dDate = date_now - timedelta(hours = fHourBack)
     print 'back time = ', dDate
     dDateLow = dDate - timedelta(hours = 1)
     dDateHi = dDate + timedelta(hours = 1)
@@ -164,33 +166,25 @@ def getPressDelta(conn, fpress):
     squery = "SELECT datehour, pressure FROM data WHERE ID = '43' AND datehour > '" + str(dDateLow) +"' AND datehour < '"+str(dDateHi) + "'"
 #    print ('test query =', squery)
     cursor = conn.execute(squery)
-    dsum = 0
-    dsumcoef = 0
+    # Use the pressure closest to current time - fHourBack (scanning within an hour)
+    dmin = 10
+    dpress_per_hour = 0.0
     for row in cursor:
         (dts, press) = row
         dt = datetime.strptime(dts,"%Y-%m-%d %H:%M:%S")
         delta = dDate - dt
-        dsec = delta.total_seconds()/3600
-        print 'dts = ', dts, '  press = ',press, ' dsec = ', dsec
-        if dsec > -1 and dsec < 0:
-            dcoef = 1 + dsec
-            dsum += dcoef * press
-            dsumcoef += dcoef
-            print dsec, press, dsum
-        elif dsec < 1 and dsec >= 0:
-            dcoef = 1 - dsec
-            dsum += dcoef * press
-            dsumcoef += dcoef
-            print dsec, press, dsum
-    print 'dsum = ', dsum, ', dsumcoef=', dsumcoef
-    if dsumcoef == 0:
-        return ''
-    if dsumcoef > 0:
-        dsumnew = dsum/dsumcoef
-        print 'Corrected = ', dsumnew, ' fpress = ', fpress
-    deltapHour = (fpress - dsum)/fHourBack
-    sret = "%.2f/hr" % (deltapHour)
-    if deltapHour > 0:
+        dsec = abs(delta.total_seconds()/3600)
+        if (dsec < dmin):
+            dmin = dsec
+            dt_past = date_now - dt
+            dt_past_hour = dt_past.total_seconds()/3600
+            dpress_per_hour = (fpress - press)/dt_past_hour
+            #print 'dts = ', dts, 'dsec', dsec, '  press = ',press, ' dt_past_hour = ', dt_past_hour
+            #print 'dpress_per_hour = ', dpress_per_hour
+    if dmin == 10:
+        return ' '
+    sret = "%.2f/hr" % (dpress_per_hour)
+    if dpress_per_hour > 0:
         sret = '+' + sret
     #print 'sret =', sret
     return sret
