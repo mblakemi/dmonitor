@@ -12,8 +12,9 @@ import math
 #19-11-16 1.01 Support for pressure and delta pressure
 #19-11-18 removed Rain column, added Dark option
 #19-11-27 delta pressure uses closest to time back
+#1.02.2 use last observed date time for delta pressure
 
-print 'Version 1.02.1'
+print 'Version 1.02.2'
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -155,11 +156,13 @@ infoCardEnd = """
 """
 
 ################ Get change in pressure from 2 hours ago in inHg/hr
-def getPressDelta(conn, fpress):
+def getPressDelta(conn, fpress, sdate):
     fHourBack = 2.5
     date_now = datetime.now()
+    date_now = datetime.strptime(sdate,"%Y-%m-%d %H:%M:%S.%f")
     dDate = date_now - timedelta(hours = fHourBack)
-    print 'back time = ', dDate
+    #print 'back time = ', dDate
+    #print 'date_now = ', date_now
     dDateLow = dDate - timedelta(hours = 1)
     dDateHi = dDate + timedelta(hours = 1)
     
@@ -220,7 +223,7 @@ def writehtml(isensor):
         temphtml = infoCardStart % (color, color, asensor.sname, temp, humid, tdewf)
         # add Pressure if non-zero
         if (fpress != 0.0):
-            sRise = getPressDelta(conn, fpress)
+            sRise = getPressDelta(conn, fpress, date)
             sPress = "<h5 class='text-muted'>Pressure: %.2f %s;</h5>" % (fpress, sRise)
             temphtml += sPress
         # add rain if non-zero
