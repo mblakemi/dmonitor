@@ -19,7 +19,7 @@ app = Flask(__name__, static_url_path='/static')
 #pi ip address is:http://192.168.0.105/
 #pi can use localhost instead of ip address
 
-btest = False #True # Run test and not flask
+btest = True #True # Run test and not flask
 
 nRestarts = 0
 g_timeString="none"
@@ -155,7 +155,9 @@ infoCardEnd = """
 
 ################ Get change in pressure from 2 hours ago in inHg/hr
 def getPressDelta(conn, fpress):
-    dDate = datetime.now() - timedelta(hours = 2)
+    fHourBack = 2.5
+    dDate = datetime.now() - timedelta(hours = fHourBack)
+    print 'back time = ', dDate
     dDateLow = dDate - timedelta(hours = 1)
     dDateHi = dDate + timedelta(hours = 1)
     
@@ -169,23 +171,24 @@ def getPressDelta(conn, fpress):
         dt = datetime.strptime(dts,"%Y-%m-%d %H:%M:%S")
         delta = dDate - dt
         dsec = delta.total_seconds()/3600
+        print 'dts = ', dts, '  press = ',press, ' dsec = ', dsec
         if dsec > -1 and dsec < 0:
             dcoef = 1 + dsec
             dsum += dcoef * press
             dsumcoef += dcoef
-#            print dsec, press, dsum
+            print dsec, press, dsum
         elif dsec < 1 and dsec >= 0:
             dcoef = 1 - dsec
             dsum += dcoef * press
             dsumcoef += dcoef
- #           print dsec, press, dsum
-    #print 'dsum = ', dsum, ', dsumcoef=', dsumcoef
+            print dsec, press, dsum
+    print 'dsum = ', dsum, ', dsumcoef=', dsumcoef
     if dsumcoef == 0:
         return ''
-    if dsumcoef > 0 and dsumcoef < .999:
+    if dsumcoef > 0:
         dsumnew = dsum/dsumcoef
-        #print 'Corrected = ', dsumnew
-    deltapHour = (fpress - dsum)/2.0
+        print 'Corrected = ', dsumnew, ' fpress = ', fpress
+    deltapHour = (fpress - dsum)/fHourBack
     sret = "%.2f/hr" % (deltapHour)
     if deltapHour > 0:
         sret = '+' + sret
@@ -767,7 +770,7 @@ if __name__ == "__main__":
     now = datetime.now()
     if btest:
         writehtml(g_sSource) #min max
-        nDaysBack = 1
+        nDaysBack = 0
         mPressure = 1
         write_thplot(g_sSource, nDaysBack, mPressure)
         
