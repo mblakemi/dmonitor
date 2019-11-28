@@ -13,15 +13,16 @@ import math
 #19-11-18 removed Rain column, added Dark option
 #19-11-27 delta pressure uses closest to time back
 #1.02.2 use last observed date time for delta pressure
+#1.03 Humidity added
 
-print 'Version 1.02.2'
+print 'Version 1.03'
 
 app = Flask(__name__, static_url_path='/static')
 
 #pi ip address is:http://192.168.0.105/
 #pi can use localhost instead of ip address
 
-btest = True #True # Run test and not flask
+btest = False #True # Run test and not flask
 
 nRestarts = 0
 g_timeString="none"
@@ -394,7 +395,7 @@ stplotDarkTitle = """
  
 stplotHumidTitle = """
 	<div id="header">
-		<h2>Hourly Humidity Plot</h2>
+		<h2>Hourly Humidity Plot: %s</h2>
 	</div>
  """ 
  
@@ -486,7 +487,7 @@ def write_thplot(isensor, nDaysBack, bPressure):
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('H') +stplotFooter1
         splothtml += splotFooter1units % ('H','%')  + splotFooter1end 
         splothtml += stplotFooter2Tip % ('%') + splotFooter3
-        splothtml += stplotHumidTitle
+        splothtml += stplotHumidTitle % allSensorInfo[isensor].sname
     else: #Temperature
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('T') + stplotFooter1
         splothtml += splotFooter1units % ('T','*F') + splotFooter1end  
