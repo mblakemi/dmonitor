@@ -21,7 +21,7 @@ app = Flask(__name__, static_url_path='/static')
 #pi ip address is:http://192.168.0.105/
 #pi can use localhost instead of ip address
 
-btest = False #True # Run test and not flask
+btest = True #True # Run test and not flask
 
 nRestarts = 0
 g_timeString="none"
@@ -391,7 +391,13 @@ stplotDarkTitle = """
 		<h2>Hourly Dark Plot</h2>
 	</div>
  """ 
-  
+ 
+stplotHumidTitle = """
+	<div id="header">
+		<h2>Hourly Humidity Plot</h2>
+	</div>
+ """ 
+ 
 stplotFooterEnd = """
 	<div id="content">
 
@@ -443,6 +449,8 @@ def write_thplot(isensor, nDaysBack, bPressure):
         squery =  "SELECT datehour, pressure, ID FROM data WHERE ID = '43' AND datehour BETWEEN '" + str(dtstart) + "' AND '" + str(dtend) + "'"  
     if bPressure == 2:
         squery =  "SELECT datehour, dark, ID FROM data WHERE ID = '40' AND datehour BETWEEN '" + str(dtstart) + "' AND '" + str(dtend) + "'"  
+    if bPressure == 3:
+        squery =  "SELECT datehour, humid, ID FROM data WHERE ID = '" + sID + "' AND datehour BETWEEN '" + str(dtstart) + "' AND '" + str(dtend) + "'"  
 
     cursor = c.execute(squery)
     if doPrint:
@@ -464,32 +472,45 @@ def write_thplot(isensor, nDaysBack, bPressure):
                
     strDate = dtstart.strftime('%b %d %Y')
     
-    if bPressure == 1:
+    if bPressure == 1: #Pressure
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('P') + stplotFooter1
         splothtml += splotFooter1units % ('P','inHg') + splotFooter1end       
         splothtml += stplotFooter2Tip % ('inHg') + splotFooter3
         splothtml += stplotPressureTitle
-    elif bPressure == 2:
+    elif bPressure == 2: #Dark
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('D') +stplotFooter1
         splothtml += splotFooter1units % ('D','dark')  + splotFooter1end 
         splothtml += stplotFooter2Tip % ('dark') + splotFooter3
         splothtml += stplotDarkTitle
-    else:
+    elif bPressure == 3: #Humidity
+        splothtml = stplotHeader + stplotText + stplotFooter0unit % ('H') +stplotFooter1
+        splothtml += splotFooter1units % ('H','%')  + splotFooter1end 
+        splothtml += stplotFooter2Tip % ('%') + splotFooter3
+        splothtml += stplotHumidTitle
+    else: #Temperature
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('T') + stplotFooter1
         splothtml += splotFooter1units % ('T','*F') + splotFooter1end  
         splothtml += stplotFooter2Tip % ('*F') + splotFooter3
         splothtml += stplotTitle % allSensorInfo[isensor].sname
 
-    if bPressure == 0:
-        splothtml += '<a href="sourcep">Source</a>  '
-        splothtml += '<a href="darkp">Dark</a> ' 
+    if bPressure == 0: #Temp
+        splothtml += '<a href="sourcep">Source</a> '
+        splothtml += '<a href="darkp">Dark</a> '
+        splothtml += '<a href="humidp">Humidity</a> '
         splothtml += '<a href="pressurep">Pressure</a>'        
-    if bPressure == 1:
+    elif bPressure == 1: #Pressure
         splothtml += '<a href="darkp">Dark</a> ' 
-        splothtml += '<a href="tempp">Temperature</a>'
-    elif bPressure == 2:
-        splothtml += '<a href="pressurep">Pressure</a> '  
-        splothtml += '<a href="tempp">Temperature</a>'
+        splothtml += '<a href="humidp">Humidity</a> '
+        splothtml += '<a href="tempp">Temperature</a> '
+    elif bPressure == 2: #Dark
+        splothtml += '<a href="pressurep">Pressure</a> '
+        splothtml += '<a href="humidp">Humidity</a> '
+        splothtml += '<a href="tempp">Temperature</a> '
+    elif bPressure == 3: #Humidity
+        splothtml += '<a href="sourcep">Source</a> '
+        splothtml += '<a href="darkp">Dark</a> ' 
+        splothtml += '<a href="pressurep">Pressure</a> '    
+        splothtml += '<a href="tempp">Temperature</a>  '       
        
     splothtml = splothtml + "<h3>" + strDate + "   "
     splothtml = splothtml + '<a href="prev">Prev</a>  <a href="inoutr">Home</a>'
@@ -742,6 +763,16 @@ def darkp():
     write_thplot(g_sSource, g_nPrev, g_bPressure)
     return render_template('plot.html')
 
+@app.route("/humidp")
+def humidp():
+    global g_nPrev
+    global g_sSource
+    global g_bPressure
+    g_bPressure = 3
+    
+    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    return render_template('plot.html')
+
 @app.route("/prev")
 def dataprev():
     global g_nPrev
@@ -768,7 +799,8 @@ if __name__ == "__main__":
     if btest:
         writehtml(g_sSource) #min max
         nDaysBack = 0
-        mPressure = 1
+        # 0=temp, 1=pressure, 2=dark, 3=humidity
+        mPressure = 3
         write_thplot(g_sSource, nDaysBack, mPressure)
         
         print 'test done'
