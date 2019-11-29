@@ -14,8 +14,9 @@ import math
 #19-11-27 delta pressure uses closest to time back
 #1.02.2 use last observed date time for delta pressure
 #1.03 Humidity added
+#1.031 Day of week added to plot strDate
 
-print 'Version 1.03'
+print 'Version 1.031'
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -471,7 +472,7 @@ def write_thplot(isensor, nDaysBack, bPressure):
             if doPrint:
                 print dtcur, 'hr = ', hr
                
-    strDate = dtstart.strftime('%b %d %Y')
+    strDate = dtstart.strftime('%a %b %d %Y')
     
     if bPressure == 1: #Pressure
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('P') + stplotFooter1
@@ -799,9 +800,9 @@ if __name__ == "__main__":
     now = datetime.now()
     if btest:
         writehtml(g_sSource) #min max
-        nDaysBack = 0
+        nDaysBack = 2
         # 0=temp, 1=pressure, 2=dark, 3=humidity
-        mPressure = 3
+        mPressure = 0
         write_thplot(g_sSource, nDaysBack, mPressure)
         
         print 'test done'
