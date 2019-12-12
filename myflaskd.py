@@ -15,6 +15,7 @@ import math
 #1.02.2 use last observed date time for delta pressure
 #1.03 Humidity added
 #1.031 Day of week added to plot strDate
+# changed g_bPressure to g_nMode and g_nSource to g_nSource
 
 print 'Version 1.031'
 
@@ -29,8 +30,8 @@ nRestarts = 0
 g_timeString="none"
 
 g_nPrev = 0
-g_sSource = 0
-g_bPressure = 0 # 1 for pressure 2 for Dark
+g_nSource = 0
+g_nMode = 0 # 0 Temperature, 1 pressure, 2 dark, 3 humidity 
 
 
 
@@ -631,55 +632,55 @@ def hello():
         return render_template('retry.html', **templateData)
 
 def doMinMax():
-    global g_sSource
+    global g_nSource
     now = datetime.now()
     timeString = now.strftime("%I:%M:%S %p %a %b %d %Y" )
     templateData = {
         'date' : timeString
     }
     try:
-        writehtml(g_sSource)
+        writehtml(g_nSource)
         return render_template('maxmin.html', **templateData)
     except:
         return render_template('retry.html', **templateData)    
 
 @app.route("/inout")
 def inout():
-    global g_sSource
-    global g_bPressure
-    g_bPressure = 0
-    g_sSource = 0
+    global g_nSource
+    global g_nMode
+    g_nMode = 0
+    g_nSource = 0
     return doMinMax()
 
 @app.route("/")
 def inoutr_root():
-    global g_sSource
-    g_sSource = 0
+    global g_nSource
+    g_nSource = 0
     return doMinMax()
 
 @app.route("/inoutr")
 def inoutr():
-    global g_sSource
-    global g_bPressure
-    g_bPressure = 0
-    g_sSource = 0    
+    global g_nSource
+    global g_nMode
+    g_nMode = 0
+    g_nSource = 0    
     return doMinMax()
 
 @app.route("/source")
 def source():
-    global g_sSource
-    g_sSource += 1
-    if (g_sSource >= len(allSensorInfo)):
-        g_sSource = 0
+    global g_nSource
+    g_nSource += 1
+    if (g_nSource >= len(allSensorInfo)):
+        g_nSource = 0
     return doMinMax()
 
     
 @app.route("/tplot")
 def tplot():
-    global g_sSource
-    global g_bPressure
-    g_bPressure = 0
-    write_thplot(g_sSource, 0, 0)
+    global g_nSource
+    global g_nMode
+    g_nMode = 0
+    write_thplot(g_nSource, 0, 0)
     try:
         return render_template('plot.html')
     except:
@@ -712,10 +713,10 @@ def thrstats():
 @app.route("/thrplot")
 def thrplot():
     global g_nPrev
-    global g_sSource
+    global g_nSource
     try:
         g_nPrev = 0
-        write_thplot(g_sSource, g_nPrev, g_bPressure)
+        write_thplot(g_nSource, g_nPrev, g_nMode)
         return render_template('plot.html')
     except:
         now = datetime.now()
@@ -728,89 +729,89 @@ def thrplot():
 @app.route("/sourcep")
 def sourcep():
     global g_nPrev
-    global g_sSource
-    g_sSource += 1
-    if (g_sSource >= len(allSensorInfo)):
-        g_sSource = 0
-    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    global g_nSource
+    g_nSource += 1
+    if (g_nSource >= len(allSensorInfo)):
+        g_nSource = 0
+    write_thplot(g_nSource, g_nPrev, g_nMode)
     return render_template('plot.html')
 
 @app.route("/tempp")
 def tempp():
     global g_nPrev
-    global g_sSource
-    global g_bPressure
-    g_bPressure = 0
+    global g_nSource
+    global g_nMode
+    g_nMode = 0
     
-    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    write_thplot(g_nSource, g_nPrev, g_nMode)
     return render_template('plot.html')
 
 @app.route("/pressurep")
 def pressurep():
     global g_nPrev
-    global g_sSource
-    global g_bPressure
-    g_bPressure = 1
+    global g_nSource
+    global g_nMode
+    g_nMode = 1
     
-    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    write_thplot(g_nSource, g_nPrev, g_nMode)
     return render_template('plot.html')
 
 @app.route("/darkp")
 def darkp():
     global g_nPrev
-    global g_sSource
-    global g_bPressure
-    g_bPressure = 2
+    global g_nSource
+    global g_nMode
+    g_nMode = 2
     
-    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    write_thplot(g_nSource, g_nPrev, g_nMode)
     return render_template('plot.html')
 
 @app.route("/humidp")
 def humidp():
     global g_nPrev
-    global g_sSource
-    global g_bPressure
-    g_bPressure = 3
+    global g_nSource
+    global g_nMode
+    g_nMode = 3
     
-    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    write_thplot(g_nSource, g_nPrev, g_nMode)
     return render_template('plot.html')
 
 @app.route("/prev")
 def dataprev():
     global g_nPrev
-    global g_sSource
-    global g_bPressure
+    global g_nSource
+    global g_nMode
     g_nPrev += 1
-    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    write_thplot(g_nSource, g_nPrev, g_nMode)
     return render_template('plot.html')
 
 @app.route("/next")
 def datanext():
     global g_nPrev
-    global g_sSource
-    global g_bPressure
+    global g_nSource
+    global g_nMode
     g_nPrev -= 1
     if g_nPrev < 0:
         g_nPrev = 0
-    write_thplot(g_sSource, g_nPrev, g_bPressure)
+    write_thplot(g_nSource, g_nPrev, g_nMode)
     return render_template('plot.html')
 
 
 if __name__ == "__main__":
     now = datetime.now()
     if btest:
-        writehtml(g_sSource) #min max
+        writehtml(g_nSource) #min max
         nDaysBack = 2
         # 0=temp, 1=pressure, 2=dark, 3=humidity
         mPressure = 0
-        write_thplot(g_sSource, nDaysBack, mPressure)
+        write_thplot(g_nSource, nDaysBack, mPressure)
         
         print 'test done'
     else:
         g_timeString = now.strftime("%I:%M:%S %p %a %b %d %Y" )
         for itry in range(1000):
             try:
-                app.run(host='0.0.0.0',port=80,debug=True)
+                app.run(host='0.0.0.0',port=8080,debug=True)
             except IOError:
                 nRestarts += 1
                 print 'IOError *** Restarts ***:', nRestarts
