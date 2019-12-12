@@ -15,9 +15,9 @@ import math
 #1.02.2 use last observed date time for delta pressure
 #1.03 Humidity added
 #1.031 Day of week added to plot strDate
-# changed g_bPressure to g_nMode and g_nSource to g_nSource
+#1.032 changed g_bPressure to g_nMode and g_nSource to g_nSource
 
-print 'Version 1.031'
+print 'Version 1.032'
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -420,7 +420,7 @@ stplotFooterEnd = """
 </html>
 """
 
-def write_thplot(isensor, nDaysBack, bPressure):
+def write_thplot(isensor, nDaysBack, nMode):
  
     sID = allSensorInfo[isensor].sid
     
@@ -448,11 +448,11 @@ def write_thplot(isensor, nDaysBack, bPressure):
             print dtstart, dtend
     
     squery =  "SELECT datehour, temp, ID FROM data WHERE ID = '" + sID + "' AND datehour BETWEEN '" + str(dtstart) + "' AND '" + str(dtend) + "'"    
-    if bPressure == 1:
+    if nMode == 1:
         squery =  "SELECT datehour, pressure, ID FROM data WHERE ID = '43' AND datehour BETWEEN '" + str(dtstart) + "' AND '" + str(dtend) + "'"  
-    if bPressure == 2:
+    if nMode == 2:
         squery =  "SELECT datehour, dark, ID FROM data WHERE ID = '40' AND datehour BETWEEN '" + str(dtstart) + "' AND '" + str(dtend) + "'"  
-    if bPressure == 3:
+    if nMode == 3:
         squery =  "SELECT datehour, humid, ID FROM data WHERE ID = '" + sID + "' AND datehour BETWEEN '" + str(dtstart) + "' AND '" + str(dtend) + "'"  
 
     cursor = c.execute(squery)
@@ -475,17 +475,17 @@ def write_thplot(isensor, nDaysBack, bPressure):
                
     strDate = dtstart.strftime('%a %b %d %Y')
     
-    if bPressure == 1: #Pressure
+    if nMode == 1: #Pressure
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('P') + stplotFooter1
         splothtml += splotFooter1units % ('P','inHg') + splotFooter1end       
         splothtml += stplotFooter2Tip % ('inHg') + splotFooter3
         splothtml += stplotPressureTitle
-    elif bPressure == 2: #Dark
+    elif nMode == 2: #Dark
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('D') +stplotFooter1
         splothtml += splotFooter1units % ('D','dark')  + splotFooter1end 
         splothtml += stplotFooter2Tip % ('dark') + splotFooter3
         splothtml += stplotDarkTitle
-    elif bPressure == 3: #Humidity
+    elif nMode == 3: #Humidity
         splothtml = stplotHeader + stplotText + stplotFooter0unit % ('H') +stplotFooter1
         splothtml += splotFooter1units % ('H','%')  + splotFooter1end 
         splothtml += stplotFooter2Tip % ('%') + splotFooter3
@@ -496,20 +496,20 @@ def write_thplot(isensor, nDaysBack, bPressure):
         splothtml += stplotFooter2Tip % ('*F') + splotFooter3
         splothtml += stplotTitle % allSensorInfo[isensor].sname
 
-    if bPressure == 0: #Temp
+    if nMode == 0: #Temp
         splothtml += '<a href="sourcep">Source</a> '
         splothtml += '<a href="darkp">Dark</a> '
         splothtml += '<a href="humidp">Humidity</a> '
         splothtml += '<a href="pressurep">Pressure</a>'        
-    elif bPressure == 1: #Pressure
+    elif nMode == 1: #Pressure
         splothtml += '<a href="darkp">Dark</a> ' 
         splothtml += '<a href="humidp">Humidity</a> '
         splothtml += '<a href="tempp">Temperature</a> '
-    elif bPressure == 2: #Dark
+    elif nMode == 2: #Dark
         splothtml += '<a href="pressurep">Pressure</a> '
         splothtml += '<a href="humidp">Humidity</a> '
         splothtml += '<a href="tempp">Temperature</a> '
-    elif bPressure == 3: #Humidity
+    elif nMode == 3: #Humidity
         splothtml += '<a href="sourcep">Source</a> '
         splothtml += '<a href="darkp">Dark</a> ' 
         splothtml += '<a href="pressurep">Pressure</a> '    
@@ -811,7 +811,7 @@ if __name__ == "__main__":
         g_timeString = now.strftime("%I:%M:%S %p %a %b %d %Y" )
         for itry in range(1000):
             try:
-                app.run(host='0.0.0.0',port=8080,debug=True)
+                app.run(host='0.0.0.0',port=80,debug=True)
             except IOError:
                 nRestarts += 1
                 print 'IOError *** Restarts ***:', nRestarts
