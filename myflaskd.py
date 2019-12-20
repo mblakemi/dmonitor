@@ -84,6 +84,10 @@ sprefix = """<!DOCTYPE HTML>
 <head>
 <title>T RH data R</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+  <!-- Load our React component. -->
+  <script language="javascript" type="text/javascript" src="static/like_button.js"></script>
 </head>
 <nav class="navbar navbar-dark bg-dark">
   <a class="navbar-brand" href="#">Temperature Dashboard: %s</a>
@@ -95,6 +99,7 @@ sprefix = """<!DOCTYPE HTML>
   </form>
 </nav>
 <br>
+<div id="like_button_container"></div>
 <div class="container-fluid">
 """
 spostfix = """

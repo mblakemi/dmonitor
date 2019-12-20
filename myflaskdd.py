@@ -89,9 +89,11 @@ def TdewF(TF, RH):
 sprefix = """<!DOCTYPE HTML>
 <html>
 <head>
-<title>T RH data R</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <title>T RH data R</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 </head>
+<body>
+<!-- Load our React component. --> 
 <nav class="navbar navbar-dark bg-dark">
   <a class="navbar-brand" href="#">Temperature Dashboard: %s</a>
 """
@@ -108,12 +110,15 @@ sprefix1 = """
 sprefix2 = """
 </nav>
 <br>
+<div id="like_button_container"></div>
 <div class="container-fluid">
 """
 spostfix = """
     </tbody>
   </table>
 </div>
+
+</body>
 </html>
 """
 
@@ -437,6 +442,7 @@ stplotFooterEnd = """
 			<span id="clickdata"></span>
 		</p>
 	</div>
+
 </body>
 </html>
 """
@@ -576,6 +582,10 @@ sprefixHour = """<!DOCTYPE HTML>
 <h2>Sensor %s data: %s</h2>
 """
 spostfix = """
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+  <script src="{{ url_for('static', filename="js/like_button.js")}}"></script>
+</body>
 </html>
 """
 def hourly_html(isensor, nDaysBack):
