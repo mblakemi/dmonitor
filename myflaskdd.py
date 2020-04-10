@@ -6,6 +6,7 @@ from flask import request
 import sqlite3
 from datetime import datetime, timedelta
 import math
+import os
 
 #17-04-22 Use '/' for ReadThr html files
 #19-03-07 Added Source option to view Garage values (until Home is used)
@@ -21,9 +22,10 @@ import math
 #1.037 Introduced myflaskdd.py test version using parameter passing
 #different users can use dmonitor at the same time with different source, prev and mode
 #1.04 isXfinity option
+#1.05 auto use isXfinity if pmonitor directory
 
-print 'Version 1.04'
-isXfinity = True
+print 'Version 1.05'
+
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -31,6 +33,16 @@ app = Flask(__name__, static_url_path='/static')
 #pi can use localhost instead of ip address
 
 btest = False #True # Run test and not flask
+
+# determine if Xfinity or Bently ip devices are used
+isXfinity = False
+print ('Path' + os.getcwd())
+thedir = os.path.basename(os.getcwd())
+if thedir == 'pmonitor':
+    print 'Xfinity version: pmonitor directory'
+    isXfinity = True
+else:
+    print 'Bentley version: not pmonitor directory'
 
 nRestarts = 0
 g_timeString="none"
