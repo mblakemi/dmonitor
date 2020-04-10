@@ -8,9 +8,12 @@ Created on Thu Feb 07 11:48:45 2019
 19-05-29 signal added for alarm if can't read data
 ** Note, signal.SIGALRM not supported in Windows Python
 2019-11-13 Add Pressure
+2020-03-26 add try to sleep - sometimes crashed there if 5 read fails
 """
 
-strNameVer = 'monitordb.py 10 01'
+strNameVer = 'monitordb.py 10 04'
+
+isXfinity = False
 
 tKludgeSec = 15 #Use 15 for original pi and 35 for new pi
 
@@ -23,10 +26,22 @@ import math
 import sys
 import pickle
 import os.path
+import os
 import pdb
 import re
 import sqlite3
 import signal
+
+
+# determine if Xfinity or Bently ip devices are used
+isXfinity = False
+print ('Path' + os.getcwd())
+thedir = os.path.basename(os.getcwd())
+if thedir == 'pmonitor':
+    print 'Xfinity version: pmonitor directory'
+    isXfinity = True
+else:
+    print 'Bentley version: not pmonitor directory'
 
 
 sleepmin = 5 # Sampling rate in minutes (was 2)
@@ -61,9 +76,14 @@ if os.path.isfile("../set.txt"):
 #strURL40 = 'http://141.133.76.62:8484/data' #basemt
 #strURL43 = 'http://141.133.76.227:8484/data' #garage
 
-strURL40 = 'http://10.0.0.226:8484/data' #basemt
-strURL43 = 'http://10.0.0.34:8484/data' #denbme
+if isXfinity:
+    strURL40 = 'http://10.0.0.226:8484/data' #basemt
+    strURL43 = 'http://10.0.0.34:8484/data' #denbme
 #strURL43 = 'http://10.0.0.123:8484/data' #garage
+else:
+    #Bentley addresses
+    strURL40 = 'http://141.133.76.62:8484/data' #basemt
+    strURL43 = 'http://141.133.76.227:8484/data' #garage    
 
 # uncomment following line to test could not read error
 #strURL43 = 'http://141.133.76.220:8484/data' #test
@@ -419,8 +439,11 @@ while True:
         for ii in range(nSpeedup):
             time.sleep(shortSleep)
     else:
-        # just sleep the whole time        
-        time.sleep(nextSleepSec)
+        # just sleep the whole time 
+        try:       
+            time.sleep(nextSleepSec)
+        except  IOError as er:
+            print('except in SLEEP', er)
 
  # close connection
 conn.close()    

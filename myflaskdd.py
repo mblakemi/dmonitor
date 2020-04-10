@@ -20,8 +20,10 @@ import math
 #1.032 changed g_bPressure to g_nMode and g_nSource to g_nSource
 #1.037 Introduced myflaskdd.py test version using parameter passing
 #different users can use dmonitor at the same time with different source, prev and mode
+#1.04 isXfinity option
 
-print 'Version 1.037'
+print 'Version 1.04'
+isXfinity = True
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -66,8 +68,11 @@ class CSensorInfo():
          self.sid = sid
 
 # should really be in dmonitor.db
-allSensorInfo = [CSensorInfo('40', 'Outside'), CSensorInfo('43', 'Garage') ]
-         
+if isXfinity:
+    allSensorInfo = [CSensorInfo('40', 'OutDeck'), CSensorInfo('43', 'Den') ]
+else:
+    allSensorInfo = [CSensorInfo('40', 'Outside'), CSensorInfo('43', 'Garage') ]
+        
 # ------------ Dew Point Formulas ------------
 #Centigrate
 def TdewC(TC, RH):

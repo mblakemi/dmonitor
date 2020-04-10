@@ -17,7 +17,19 @@ hanging on opening connections to probes
 6/24/2019 Restarted pre DC trip (Note, when just closed os window and 
 tried to restart myflaskd.py, it didn't work. So, restarted.
 
+Could not read 141.133.76.227 try 5 at 2020-01-07 16:45:33
+*** read error at *** 2020-01-07 16:45:35.123635
+No temperature available, skipped ***** ID =43  T =2020-01-07 16:45:15.095452
+Signal handler called with signal 14
+Traceback (most recent call last):
+  File "adsmonitor.py", line 418, in <module>
+    time.sleep(nextSleepSec)
+  File "adsmonitor.py", line 118, in handler
+    raise IOError("Couldn't open device!")
+IOError: Couldn't open device!
+
 +
+
 
 Could not read 141.133.76.227 try 5 at 2019-11-26 11:44:02
 *** read error at *** 2019-11-26 11:44:04.029184
