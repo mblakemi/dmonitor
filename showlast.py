@@ -4,7 +4,7 @@ Created on Fri Feb 08 20:03:41 2019
 
 @author: Michael
 """
-
+# modified for Python 3
 
 import sqlite3
 # import os, sys
@@ -74,19 +74,19 @@ if bTestCode:
             dcoef = 1 + dsec
             dsum += dcoef * press
             dsumcoef += dcoef
-            print dsec, press, dsum
+            print (dsec, press, dsum)
         elif dsec < 1 and dsec >= 0:
             dcoef = 1 - dsec
             dsum += dcoef * press
             dsumcoef += dcoef
-            print dsec, press, dsum
-    print 'dsum = ', dsum, ', dsumcoef=', dsumcoef
+            print (dsec, press, dsum)
+    print ('dsum = ', dsum, ', dsumcoef=', dsumcoef)
     if dsumcoef > 0 and dsumcoef < .999:
         dsumnew = dsum/dsumcoef
-        print 'Corrected = ', dsumnew
+        print ('Corrected = ', dsumnew)
         
 
-    print 'test done' 
+    print ('test done') 
 
 #show recent data
 squery = "SELECT datehour, temp, ID FROM data WHERE ID = '" + sid + "' AND datehour > '2019-02-05'"
@@ -132,14 +132,14 @@ if bAddcurrent:
     cursor = c.execute("SELECT name from sqlite_master WHERE type='table' AND name = 'current'")
     for row in cursor:
         bFound = True
-        print row
+        print (row)
     if not bFound:
         # Add current table
         c.execute('CREATE TABLE current (ID text, DATE date, TEMP real, HUMID real, FPRESS real, DARK real, PRIMARY KEY (ID))')
         conn.commit() 
-        print ' Table current added'
+        print (' Table current added')
     else:
-        print 'Table current exists'   
+        print ('Table current exists')  
 
 if 0:
     #'CREATE TABLE minmax (DAY datetime, ID text, MINT real, MINTIME text, MAXT real, MAXTIME text , PRIMAR
@@ -149,22 +149,22 @@ if 0:
     showqueryresults(squery)
     
 if bAddPressure:
-    print 'info data='
+    print ('info data=')
     c.execute("PRAGMA table_info(data)")
-    print c.fetchall()
+    print (c.fetchall())
     
     # add column
     addColumn = "ALTER TABLE data ADD COLUMN PRESSURE real"
     c.execute(addColumn)
 
-    print 'new data='
+    print ('new data=')
     c.execute("PRAGMA table_info(data)")
-    print c.fetchall()
+    print (c.fetchall())
 
 if bShowTables:
-    print 'new data='
+    print ('new data=')
     c.execute("PRAGMA table_info(data)")
-    print c.fetchall()    
+    print (c.fetchall())   
 # close connection
 conn.close() 
    
