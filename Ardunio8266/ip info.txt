@@ -1,0 +1,37 @@
+
+Outside:
+MAC: A0:20:A6:16:CA:3D
+http://10.0.0.116:8484/
+
+OutDeck 10.0.0.232
+MAC: A0:20:A6:04:7B:F5
+
+43 Garage 10.0.0.104
+MAC: A0:20:A6:05:88:A0
+
+Notes on 8266 code:
+9/8/2020 exp_8266_th_pressAnalog_OLED used for
+Outside, Outdeck and Garage. Set MAC_LAST to last two
+hex digits of MAC address and
+set Ardunio8266/libraries/accessinfo/accessinfo.h for WiFi info
+For Timezone use
+// Note 5UL for Eastern, 6UL for Central
+#define localTimeOffset 3600UL * 6UL // 21600UL your localtime offset from UCT
+
+================================================
+This is no longer valid
+
+
+
+Garage http://144.133.76.227:8484/
+http://141.133.76.227:8484
+
+Basement http://144.133.72.79:8484/
+Water http://144.133.74.126:8484/
+
+Pi floor:
+http://144.133.72.108/22
+
+Pi desk
+http://144.133.72.125
+
