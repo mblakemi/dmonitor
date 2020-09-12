@@ -7,9 +7,15 @@
 // Name for node in snodename
 
 // Use last MAC digits to set sensor program code
+#define SENSOR_ID 2 //0 Outside, 1 Deck, 2 Garage
+
+#if SENSOR_ID == 0
 #define MAC_LAST 0x3D //Outside
-//#define MAC_LAST 0xF5 //Outdeck
-//#define MAC_LAST 0xA0 //Outdeck
+#elif SENSOR_ID == 1
+#define MAC_LAST 0xF5 //Outdeck
+#else
+#define MAC_LAST 0xA0 //Garage
+#endif
 
 // changes:
 // 17/03/18 Toggle LED out for each rain tilt for testing
@@ -21,11 +27,13 @@
 #if MAC_LAST == 0x3D //Outside
 #define snodename "Outside"
 #define ANALOG
+#define IP_LAST_OCTET 98 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
 #endif
 
 #if MAC_LAST == 0xF5 //Outdeck
 #define snodename "OutDeck"
 #define ANALOG
+#define IP_LAST_OCTET 97 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
 #endif
 
 #if MAC_LAST == 0xA0 //Garage
@@ -34,6 +42,7 @@
 #define UseBMP280     // for BMP280 both this and BMP180 are set
 float dTempOffset = 0.0; // -2.0;
 float dTempOffset180 = 0.0; // for 180
+#define IP_LAST_OCTET 96 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
 #endif
 
 
@@ -98,7 +107,7 @@ float fLastAnalogAvg = 0.0;
 // ***************************************************************************************************************************************************************
 // These are defines you'll want to change depending on which node you're programming, also look for AP_SSID and AP_PASSWORD
 // More info on these values and others further down, readl all comments (even if some MIGHT be out of date)
-#define IP_LAST_OCTET 41 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
+//1`#define IP_LAST_OCTET 41 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
 #define TEMP_TYPE DHT22 // set this to DS18 for Dallas 3 pin sensors, or DHT22 or DTH11 for the DHT 4 pin sensors
 //#define USE_OLED // Uncomment if you're using an SSD1306 type 128x64 OLED display (currently set up for I2C version)
 //#define USE_TFT // Uncomment if you're using an ILI9341 type TFT display (you can have both OLED and TFT hooked up at the same time, display functions currently will mirror the data)
@@ -153,11 +162,11 @@ WiFiServer server(PORT);
 // You can probably get this info by examining your computer's wifi network configuration (in Windows type "ipconfig" in a command line window)
 // Note that the static IP is based on value of IP_LAST_OCTET
 #if 1
-const IPAddress myIp(141,133,74,188);
-const IPAddress gateway(141,133,75,255);
-const IPAddress subnet(255,255,252,0);
-const IPAddress dns1(141,133,75,255);
-const IPAddress dns2(141,133,75,255);
+const IPAddress myIp(10,0,0,IP_LAST_OCTET);
+const IPAddress gateway(10,0,0,1);
+const IPAddress subnet(255,255,255,0);
+const IPAddress dns1(75,75,75,75);
+const IPAddress dns2(75,75,76,76);
 #else
 const IPAddress myIp(141, 133, 74, 81);
 const IPAddress gateway(141, 133, 75, 255);
@@ -195,7 +204,7 @@ namespace codeus {
 // TODO: change code to allow slave nodes to ping a master and add or remove themselves dynamically
 codeus::NODEMCU_NODE NODEMCU_NODES[] = {
   {true,  40, "Deck", NULL},
-  {false, 41, snodename, NULL},
+  {false, IP_LAST_OCTET, snodename, NULL},
 };
 #define NODEMCU_NODE_COUNT sizeof NODEMCU_NODES / sizeof NODEMCU_NODES[0]
 
@@ -352,7 +361,7 @@ void connectWifiAccessPoint(String ssid, String password) {
   WiFi.reconnect();
   WiFi.mode(WIFI_STA);
   // not for Bentley 
-  //WiFi.config(myIp, gateway, subnet, dns1, dns2);
+  WiFi.config(myIp, gateway, subnet, dns1, dns2);
   displayAll("Begin SSID:\n" + ssid);
   char ssidCC[60];
   char passwordCC[60];

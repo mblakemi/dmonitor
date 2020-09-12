@@ -1,23 +1,11 @@
 // This code can be found at: https://github.com/horack/esp8266_arduino_temperature_nodes
 // It has been build with snippets of code from many places, I've tried to provide links wherever I remembered the source...
 
-// localTimeOffset - for time zone offset
-// set WiFi in accessinfo.h from ..Arduino/libraries/accessinfo/accessinfo.h
-// Name for sensor: NODEMCU_NODES
-// Name for node in snodename
-#define MAC_3D //Outside
-
 // changes:
 // 17/03/18 Toggle LED out for each rain tilt for testing
 // 17/03/23 added /zero option to reset rain and rainDate
 // 17/04/07 added bmp 180 and pressure (use T from bmp 180)
 // 18/09/12 Updated for Bentley with analog 'Outdoor'
-// 20/09/08 Used for Outside 3D in apartment
-
-#ifdef MAC_3D
-#define snodename "Outside"
-#define ANALOG
-#endif
 
 //#define BMP180
 
@@ -30,7 +18,7 @@ float fPressOffset = 1.03; // Pressure offset
 
 // #define RAIN_SENSOR
 
-
+#define ANALOG
 
 #ifdef ANALOG
 // Use this value
@@ -167,7 +155,7 @@ namespace codeus {
 // TODO: change code to allow slave nodes to ping a master and add or remove themselves dynamically
 codeus::NODEMCU_NODE NODEMCU_NODES[] = {
   {true,  40, "Deck", NULL},
-  {false, 41, snodename, NULL},
+  {false, 41, "Outside", NULL},
 };
 #define NODEMCU_NODE_COUNT sizeof NODEMCU_NODES / sizeof NODEMCU_NODES[0]
 
@@ -785,16 +773,8 @@ void updateAnalog() {
       }
       // Update global value
       fLastAnalogAvg = fTempSum/nLastAnalogTot;
-
-      // serial print values
-      Serial.print("T = ");
-      Serial.print(temp_f);
-      Serial.print(", H = ");
-      Serial.print(humidity);
-           
-      Serial.print("%,  ALastMax= ");
+      Serial.print("ALastMax= ");
       Serial.println(fLastAnalogAvg);
-
       // Reset 
       // Reset Values
       // iSum = 1;
@@ -898,8 +878,7 @@ void updateTimeFromServer() {
 // NPT server time retrieve code -------------------------------------------------------------------------------------------------------
 // Found at (and slightly munged) http://www.esp8266.com/viewtopic.php?p=18395 posted by user "nigelbe", it is all the info I have, thank you Nigel
 // Note that I've modified the dst function to (hopefully) get correct daylight savings time offset for USA
-// 5UL for Eastern 6UL for Central Time
-#define localTimeOffset 3600UL * 6UL // 21600UL your localtime offset from UCT
+#define localTimeOffset 3600UL * 5UL // 21600UL your localtime offset from UCT
 WiFiUDP udp;
 unsigned int localPort = 2390; // local port to listen for UDP packets
 const char* timeServer = "us.pool.ntp.org"; // fall back to regional time server
