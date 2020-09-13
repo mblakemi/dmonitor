@@ -1,12 +1,14 @@
+// 9/12/2020 static addresses assigned for pi
+// and 8266s using code esp_8266_th_pressAnalog_OLED
 
 Outside:
 MAC: A0:20:A6:16:CA:3D
-http://10.0.0.116:8484/
+http://10.0.0.98:8484/
 
-OutDeck 10.0.0.232
+OutDeck 10.0.0.97
 MAC: A0:20:A6:04:7B:F5
 
-43 Garage 10.0.0.104
+43 Garage 10.0.0.96
 MAC: A0:20:A6:05:88:A0
 
 Notes on 8266 code:
@@ -19,19 +21,17 @@ For Timezone use
 #define localTimeOffset 3600UL * 6UL // 21600UL your localtime offset from UCT
 
 ================================================
-This is no longer valid
+Code added to sudo leafpad /etc/dhcpcd.conf
+# Example static IP configuration:
+#interface eth0
+#static ip_address=192.168.0.10/24
+#static ip6_address=fd51:42f8:caae:d92e::ff/64
+#static routers=192.168.0.1
+#static domain_name_servers=192.168.0.1 8.8.8.8 fd51:42f8:caae:d92e::1
 
+interface wlan0
+static ip_address=10.0.0.99/24
+static routers=10.0.0.1
+static domain_name_servers=75.75.75.75 75.75.76.76
 
-
-Garage http://144.133.76.227:8484/
-http://141.133.76.227:8484
-
-Basement http://144.133.72.79:8484/
-Water http://144.133.74.126:8484/
-
-Pi floor:
-http://144.133.72.108/22
-
-Pi desk
-http://144.133.72.125
 
