@@ -1,4 +1,4 @@
-// This code can be found at: https://github.com/horack/esp8266_arduino_temperature_nodes
+// The original code can be found at: https://github.com/horack/esp8266_arduino_temperature_nodes
 // It has been build with snippets of code from many places, I've tried to provide links wherever I remembered the source...
 
 // localTimeOffset - for time zone offset
@@ -7,7 +7,7 @@
 // Name for node in snodename
 
 // Use last MAC digits to set sensor program code
-#define SENSOR_ID 2 //0 Outside, 1 Deck, 2 Garage
+#define SENSOR_ID 0 //0 Outside, 1 Deck, 2 Garage
 
 #if SENSOR_ID == 0
 #define MAC_LAST 0x3D //Outside
@@ -23,15 +23,18 @@
 // 17/04/07 added bmp 180 and pressure (use T from bmp 180)
 // 18/09/12 Updated for Bentley with analog 'Outdoor'
 // 20/09/08 Used for Outside, OutDeck and Garage in 740 apartment
+// 20/09/12 Fixed IP for apartment, added OLED to Garage
 
 #if MAC_LAST == 0x3D //Outside
 #define snodename "Outside"
+float dTempOffset = 0.0; // DHT22 offset
 #define ANALOG
 #define IP_LAST_OCTET 98 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
 #endif
 
 #if MAC_LAST == 0xF5 //Outdeck
 #define snodename "OutDeck"
+float dTempOffset = 0.0; // DHT22 offset
 #define ANALOG
 #define IP_LAST_OCTET 97 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
 #endif
@@ -40,8 +43,9 @@
 #define snodename "Garage"
 #define BMP180        // set this if BMP280 or BMP180
 #define UseBMP280     // for BMP280 both this and BMP180 are set
-float dTempOffset = 0.0; // -2.0;
-float dTempOffset180 = 0.0; // for 180
+float dTempOffset = 1.0; // -2.0;
+float dTempOffset180 = -2.0; // for 180
+#define MY_OLED
 #define IP_LAST_OCTET 96 // This defines this node's static IP, read on for more info (also find array NODEMCU_NODES)
 #endif
 
@@ -745,6 +749,8 @@ String floatToStr(float f, int decims) {
 
 
 //-------------------------------------------------------------------------------------------------------
+float fTempF = 0.0; // Kind of a kludge to display bmp280 temperature
+
 void updateTemperature() {
   // read temperature sensors and update displayable strings
   unsigned long currentMillis = millis();
@@ -764,9 +770,15 @@ void updateTemperature() {
 #else
     humidity = dht.readHumidity(); // Read humidity (percent)
     temp_f = dht.readTemperature(true); // Read temperature as Fahrenheit
+#if TEMP_TYPE == DHT22
+    Serial.print("Torig = ");  
+    Serial.print(temp_f);
+    Serial.print("  ");
+#endif
+     temp_f += dTempOffset;   
 #ifdef BMP180
     float fTempC = bmp.readTemperature();
-    float fTempF = fTempC * 9.0/5.0 + 32.0;
+    fTempF = fTempC * 9.0/5.0 + 32.0;
     fTempF += dTempOffset180;
     Serial.print("Tbmp180 = ");  
     Serial.print(fTempF);
