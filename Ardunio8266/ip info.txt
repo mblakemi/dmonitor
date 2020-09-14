@@ -34,4 +34,19 @@ static ip_address=10.0.0.99/24
 static routers=10.0.0.1
 static domain_name_servers=75.75.75.75 75.75.76.76
 
+===============================================Notes on thonny:
+To run a program in sudo mode (like aflask.py the python 2/3 version)
+sudo thonny aflask.py
+
+This starts thonny and can run aflask.py
+**Warning** if you exit thonny while a flask program is running, the flask
+program keeps running. You need to reboot the pi, or use the following proceedure
+in a window:
+ps au
+# this shows running programs, one line should be:)
+# root      3047  3.7  1.9  37360 18796 pts/1    Sl   15:06   0:01 /usr/bin/python3 aflask.py
+To kill this root program, type
+sudo kill -9 3047
+# where 3047 is the PID number listed after root with the aflask.py program
+
 
