@@ -5,6 +5,7 @@ Created on Fri Feb 08 20:03:41 2019
 @author: Michael
 """
 # modified for Python 3
+# 9-15-2020 added bDelData to remove early data
 
 import sqlite3
 # import os, sys
@@ -14,13 +15,17 @@ sid = '40'
 sdate = '2019-02-08'
 sdateh = '2019-02-09 00'
 bUseNow = True
-NowItems = 4
+NowItems = 10
 
 bTestCode = False
 bShowTables = False
 bChangeMinMax = False
 bAddPressure = False
-cdate = '2019-02-09'
+cdate = '2020-09-01'
+
+bDelData = True
+delDate = '2020-09-02'
+delDateHour = '2020-09-02'
 
 bAddcurrent = False
 
@@ -41,6 +46,7 @@ def showqueryresults(squery):
     for row in cursor:
         icount += 1
         if icount > 100:
+            print('my results limit exceeded')
             break
         print (row)
         
@@ -162,9 +168,89 @@ if bAddPressure:
     print (c.fetchall())
 
 if bShowTables:
-    print ('new data=')
+    print ('data tables =')
     c.execute("PRAGMA table_info(data)")
-    print (c.fetchall())   
+    print (c.fetchall())
+    
+if bDelData:
+    # delete earlier than delDate
+    bShowCount = True
+    bDoDelete = True
+    bDoPrint = True
+    bVacuum = True
+    
+    if bShowCount:
+        print('------------------------------------')
+        print('Initial stats:')
+        squery = "select count(*) from data where datehour < '"+ delDateHour + "' and ID = 43"
+        
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' data count to delete = ', values[0])
+        squery = "select count(*) from minmax where day < '"+ delDateHour + "' and ID = 43"
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' minmax count to delete = ', values[0])
+        
+        squery = "select count(*) from data"       
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' all data count = ', values[0])
+        
+        squery = "select count(*) from minmax"       
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' all minmax count = ', values[0])
+        
+
+    if bDoDelete:
+        # Actually delete
+        squery = "delete from data where datehour < '" + delDate + "'"
+        c.execute(squery)
+        print("Total", c.rowcount, "data Records deleted successfully")
+        conn.commit()
+        
+        squery = "delete from minmax where day < '" + delDate + "'"
+        c.execute(squery)
+        print("Total", c.rowcount, "minmax Records deleted successfully")       
+        conn.commit()
+        
+    if bShowCount:
+        print('------------------------------------')
+        print('Final stats:')
+        squery = "select count(*) from data where datehour < '"+ delDateHour + "' and ID = 43"
+        
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' data count to delete = ', values[0])
+        squery = "select count(*) from minmax where day < '"+ delDateHour + "' and ID = 43"
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' minmax count to delete = ', values[0])
+        
+        squery = "select count(*) from data"       
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' all data count = ', values[0])
+        
+        squery = "select count(*) from minmax"       
+        dataCopy = c.execute(squery)
+        values = dataCopy.fetchone()
+        print ( ' all minmax count = ', values[0])
+        
+    if bDoPrint:
+        print ('data all =')
+        squery = "SELECT * from data where datehour >'2020-09-13'"
+        showqueryresults(squery)
+
+        print ('minmax all =')
+        squery = "SELECT * FROM minmax"
+        showqueryresults(squery) 
+
+    if bVacuum:
+        print ('Removing unused vacant space')
+        conn.execute("VACUUM")
+    
 # close connection
 conn.close() 
    
