@@ -5,7 +5,7 @@ Created on Fri Feb 08 20:03:41 2019
 @author: Michael
 """
 # modified for Python 3
-# 9-15-2020 added bDelData to remove early data
+# 9/21/2020 added #Change data for Multiple and DataMultiiple
 
 import sqlite3
 # import os, sys
@@ -15,20 +15,16 @@ sid = '40'
 sdate = '2019-02-08'
 sdateh = '2019-02-09 00'
 bUseNow = True
-NowItems = 10
-
+NowItems = 4
 bTestCode = False
-bShowTables = False
-bChangeMinMax = False
 bAddPressure = False
-cdate = '2020-09-01'
-
-bDelData = True
-delDate = '2020-09-02'
-delDateHour = '2020-09-02'
-
 bAddcurrent = False
 
+bShowTables = False
+# Change Data
+bChangeData = False
+bChangeDataMultiple = False
+bChangeMinMax = False
 
 dbfile = 'dmonitor.db' 
 dth_format = '%Y-%m-%d %H:%M:%S'
@@ -46,7 +42,6 @@ def showqueryresults(squery):
     for row in cursor:
         icount += 1
         if icount > 100:
-            print('my results limit exceeded')
             break
         print (row)
         
@@ -113,23 +108,65 @@ if not bTestCode:
 if not bTestCode:
     showqueryresults("SELECT * FROM current")
 
-
+## -------------- Change Section --------------
 if bChangeMinMax:
-    csid = '40'
+    bMakeChange = True
+    cdate = '2020-09-20'
+    csid = '43'
     squery = "SELECT * FROM minmax WHERE ID = '" + csid + "' AND day = '" + cdate + "'"
     showqueryresults(squery)
     
     # now change
-    maxT = 32.2
-    maxTime = '02:00p'
-    minT = 22.8
-    minTime = '06:32a'
-    oneTuple = [cdate, csid, minT, minTime, maxT, maxTime]
-    c.execute("INSERT OR REPLACE into minmax VALUES (?,?,?,?,?,?)", oneTuple)
+    if bMakeChange:
+        maxT = 76.0
+        maxTime = '03:00p'
+        minT = 68.8
+        minTime = '07:30a'
+        oneTuple = [cdate, csid, minT, minTime, maxT, maxTime]
+        c.execute("INSERT OR REPLACE into minmax VALUES (?,?,?,?,?,?)", oneTuple)
+    
+        showqueryresults(squery)
+    
+        conn.commit()
 
+if bChangeData:
+    bMakeDelete = True
+    cdate = '2020-09-20'
+    cdatehour = '2020-09-20 22:09:42'
+    csid = '43'
+#    squery = "SELECT * FROM data WHERE id = '" + csid + "' AND datehour > '" + cdate + "' AND datehour < '" + cdatePlus1 + "'"
+    squery = "SELECT * FROM data WHERE id = '" + csid + "' AND datehour = '" + cdatehour + "'"
     showqueryresults(squery)
+    
+    # now change
+    if bMakeDelete:
+        squeryDelete = "DELETE FROM data WHERE id = '" + csid + "' AND datehour = '" + cdatehour + "'"
+        squeryDelete = "DELETE FROM data WHERE id=? AND datehour=?"
 
-    conn.commit()
+        c.execute(squeryDelete, (csid,cdatehour))
+    
+        showqueryresults(squery)
+    
+        conn.commit()
+
+if bChangeDataMultiple:
+    bMakeDelete = True
+    cpressuremax = '32.0'
+    cdatehour = '2020-09-20 22:09:42'
+    csid = '43'
+    squery = "SELECT * FROM data WHERE id = '" + csid + "' AND pressure > '" + cpressuremax + "'"
+    showqueryresults(squery)
+    
+    # now change
+    if bMakeDelete:
+        squeryDelete = "DELETE FROM data WHERE id = '" + csid +  "' AND pressure > '" + cpressuremax + "'"
+
+        c.execute(squeryDelete)
+    
+        showqueryresults(squery)
+    
+        conn.commit()
+
 
 if bAddcurrent:
     bFound = False
@@ -168,89 +205,9 @@ if bAddPressure:
     print (c.fetchall())
 
 if bShowTables:
-    print ('data tables =')
+    print ('new data=')
     c.execute("PRAGMA table_info(data)")
-    print (c.fetchall())
-    
-if bDelData:
-    # delete earlier than delDate
-    bShowCount = True
-    bDoDelete = True
-    bDoPrint = True
-    bVacuum = True
-    
-    if bShowCount:
-        print('------------------------------------')
-        print('Initial stats:')
-        squery = "select count(*) from data where datehour < '"+ delDateHour + "' and ID = 43"
-        
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' data count to delete = ', values[0])
-        squery = "select count(*) from minmax where day < '"+ delDateHour + "' and ID = 43"
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' minmax count to delete = ', values[0])
-        
-        squery = "select count(*) from data"       
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' all data count = ', values[0])
-        
-        squery = "select count(*) from minmax"       
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' all minmax count = ', values[0])
-        
-
-    if bDoDelete:
-        # Actually delete
-        squery = "delete from data where datehour < '" + delDate + "'"
-        c.execute(squery)
-        print("Total", c.rowcount, "data Records deleted successfully")
-        conn.commit()
-        
-        squery = "delete from minmax where day < '" + delDate + "'"
-        c.execute(squery)
-        print("Total", c.rowcount, "minmax Records deleted successfully")       
-        conn.commit()
-        
-    if bShowCount:
-        print('------------------------------------')
-        print('Final stats:')
-        squery = "select count(*) from data where datehour < '"+ delDateHour + "' and ID = 43"
-        
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' data count to delete = ', values[0])
-        squery = "select count(*) from minmax where day < '"+ delDateHour + "' and ID = 43"
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' minmax count to delete = ', values[0])
-        
-        squery = "select count(*) from data"       
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' all data count = ', values[0])
-        
-        squery = "select count(*) from minmax"       
-        dataCopy = c.execute(squery)
-        values = dataCopy.fetchone()
-        print ( ' all minmax count = ', values[0])
-        
-    if bDoPrint:
-        print ('data all =')
-        squery = "SELECT * from data where datehour >'2020-09-13'"
-        showqueryresults(squery)
-
-        print ('minmax all =')
-        squery = "SELECT * FROM minmax"
-        showqueryresults(squery) 
-
-    if bVacuum:
-        print ('Removing unused vacant space')
-        conn.execute("VACUUM")
-    
+    print (c.fetchall())   
 # close connection
 conn.close() 
    
