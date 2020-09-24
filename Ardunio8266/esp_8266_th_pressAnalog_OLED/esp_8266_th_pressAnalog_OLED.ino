@@ -7,7 +7,7 @@
 // Name for node in snodename
 
 // Use last MAC digits to set sensor program code
-#define SENSOR_ID 0 //0 Outside, 1 Deck, 2 Garage
+#define SENSOR_ID 2 //0 Outside, 1 OutDeck, 2 Apt(was Garage)
 
 #if SENSOR_ID == 0
 #define MAC_LAST 0x3D //Outside
@@ -24,6 +24,7 @@
 // 18/09/12 Updated for Bentley with analog 'Outdoor'
 // 20/09/08 Used for Outside, OutDeck and Garage in 740 apartment
 // 20/09/12 Fixed IP for apartment, added OLED to Garage
+// 20/09/23 Changed fPressOffset to 0.835;
 
 #if MAC_LAST == 0x3D //Outside
 #define snodename "Outside"
@@ -55,7 +56,7 @@ float dTempOffset180 = -2.0; // for 180
 #ifdef UseBMP280
 #include <Adafruit_BMP280.h>
 Adafruit_BMP280 bmp; // I2C
-float fPressOffset = 0.87; //0.19; // Pressure offset .158 calc
+float fPressOffset = 0.835; //was .87 but 
 #else
 #include <Adafruit_BMP085.h>
 Adafruit_BMP085 bmp;
