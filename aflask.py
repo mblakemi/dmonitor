@@ -23,8 +23,9 @@ import os
 #different users can use dmonitor at the same time with different source, prev and mode
 #1.04 isXfinity option
 #1.05 auto use isXfinity if pmonitor directory
+#1.06 Skip pressure values > 34.0 as these are invalid
 
-print ('Version 1.05')
+print ('Version 1.06')
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -81,7 +82,7 @@ class CSensorInfo():
 
 # should really be in dmonitor.db
 if isXfinity:
-    allSensorInfo = [CSensorInfo('40', 'APT'), CSensorInfo('43', 'Garage') ]
+    allSensorInfo = [CSensorInfo('40', 'Outside'), CSensorInfo('43', 'Apt') ]
 else:
     allSensorInfo = [CSensorInfo('40', 'Outside'), CSensorInfo('43', 'Garage') ]
         
@@ -505,6 +506,10 @@ def write_thplot(isensor, nDaysBack, nMode):
             print (row,)
         dtcur = datetime.strptime(row[0], dth_format)
         stemp = row[1]
+        if row[1] != None and nMode == 1:
+            # For plots skip values above 34.0 as errors
+            if row[1] > 34.0:
+                stemp = None          
         if stemp != None:
             hr = dtcur.hour
             if (dtcur.day != dtstart.day):
